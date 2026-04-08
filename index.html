@@ -5,50 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Control de Gastos</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Fuente de Google para que se vea bonito -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-    <div class="container">
-        <h2>Mis Finanzas</h2>
-
-        <!-- Balance Principal -->
-        <h4>Tu Balance</h4>
-        <h1 id="balance">$0.00</h1>
-
-        <!-- Resumen Ingresos vs Gastos -->
-        <div class="inc-exp-container">
-            <div>
-                <h4>Ingresos</h4>
-                <p id="money-plus" class="money plus">+$0.00</p>
+    <div class="dashboard-container">
+        <!-- Menú Lateral -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-wallet"></i> Finanzas</h2>
             </div>
-            <div>
-                <h4>Gastos</h4>
-                <p id="money-minus" class="money minus">-$0.00</p>
+            <nav class="menu">
+                <a href="#" class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Gastos</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Ingresos</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Presupuestos</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Informes</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1>Resumen Mensual</h1>
+                <div class="header-actions">
+                    <select id="month-selector">
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10" selected>Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                    <button class="btn-add" onclick="document.getElementById('add-modal').style.display='block'">
+                        <i class="fas fa-plus"></i> Nueva Transacción
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tarjetas de Resumen -->
+            <div class="summary-cards">
+                <div class="card income">
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="card-info">
+                        <h4>Ingresos</h4>
+                        <p id="money-plus">$0.00 MXN</p>
+                    </div>
+                </div>
+                <div class="card expense">
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="card-info">
+                        <h4>Gastos</h4>
+                        <p id="money-minus">$0.00 MXN</p>
+                    </div>
+                </div>
+                <div class="card balance">
+                    <div class="card-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-info">
+                        <h4>Balance</h4>
+                        <p id="balance">$0.00 MXN</p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Gráficos -->
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>Gastos por Categoría</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>Gasto Semanal</h3>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Transacciones Recientes -->
+            <div class="transactions-section">
+                <h3>Transacciones Recientes</h3>
+                <div class="table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Categoría</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-list">
+                            <!-- Se llena con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para agregar transacción -->
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('add-modal').style.display='none'">&times;</span>
+            <h2>Nueva Transacción</h2>
+            <form id="form">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="type" required>
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Gasto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Concepto</label>
+                    <input type="text" id="text" placeholder="Ej. Sueldo, Café..." required />
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="category" required>
+                        <option value="comida">🍔 Comida</option>
+                        <option value="transporte">🚗 Transporte</option>
+                        <option value="vivienda">🏠 Vivienda</option>
+                        <option value="servicios">💡 Servicios</option>
+                        <option value="ocio">🎬 Ocio</option>
+                        <option value="salud">🏥 Salud</option>
+                        <option value="educacion">📚 Educación</option>
+                        <option value="otros">📦 Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Monto</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" id="date" required />
+                </div>
+                <button type="submit" class="btn-submit">Guardar Transacción</button>
+            </form>
         </div>
-
-        <!-- Historial -->
-        <h3>Historial</h3>
-        <ul id="list" class="list">
-            <!-- Aquí se agregarán las transacciones dinámicamente -->
-        </ul>
-
-        <!-- Formulario para agregar -->
-        <h3>Agregar nueva transacción</h3>
-        <form id="form">
-            <div class="form-control">
-                <label for="text">Concepto</label>
-                <input type="text" id="text" placeholder="Ej. Sueldo, Café..." />
-            </div>
-            <div class="form-control">
-                <label for="amount">Monto <br />
-                <small>(negativo - para gastos, positivo para ingresos)</small></label>
-                <input type="number" id="amount" placeholder="Ej. -20 o 500" />
-            </div>
-            <button class="btn">Agregar Transacción</button>
-        </form>
     </div>
 
     <script src="script.js"></script>
